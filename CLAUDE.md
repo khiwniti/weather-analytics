@@ -243,11 +243,7 @@ export default ComponentName;
 
 ### ⚠️ Current Limitations (See .planning/codebase/CONCERNS.md)
 
-1. **S3 Upload Disabled**: Cloud storage commented out
-   - Location: `src/ingestion/scheduler/tasks.py` line 78
-   - Uncomment `upload_to_s3()` call when S3 configured
-
-2. **Ephemeral Storage**: All data in `/tmp` (lost on restart)
+1. **Ephemeral Storage (without S3)**: Data in `/tmp` (lost on restart)
    - Pattern: `/tmp/{source}/{YYYYMMDD}/{cycle}/`
    - Configure persistent volumes or S3 for production
 
@@ -271,6 +267,12 @@ RAPIDS requires:
 - Fallback: QC modules work on CPU, but GRIB conversion may require GPU
 
 ### Configuration
+
+- **S3 Storage** (optional):
+  - Set `S3_WEATHER_BUCKET` environment variable to enable cloud uploads
+  - Configure AWS credentials: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
+  - See `.env.example` for configuration template
+  - If not configured, data remains in `/tmp` (ephemeral)
 
 - **Redis URLs**:
   - Development: `redis://localhost:6379/0`

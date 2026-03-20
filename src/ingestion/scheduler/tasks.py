@@ -74,8 +74,12 @@ def ingest_gfs_cycle(self, cycle: str = None):
             zarr_path = grib_file.replace(".grib2", ".zarr")
             convert_grib_to_zarr(grib_file, zarr_path)
 
-            # Upload to S3 (optional)
-            # upload_to_s3(zarr_path, "weather-data", f"gfs/2024/{cycle}")
+            # Upload to S3 if configured
+            s3_bucket = os.getenv("S3_WEATHER_BUCKET")
+            if s3_bucket:
+                s3_prefix = f"gfs/{datetime.utcnow().strftime('%Y/%m/%d')}/{cycle}"
+                upload_to_s3(zarr_path, s3_bucket, s3_prefix)
+                logger.info(f"Uploaded {zarr_path} to s3://{s3_bucket}/{s3_prefix}")
 
         logger.info(f"GFS {cycle}Z cycle complete")
         return {"cycle": cycle, "files_processed": len(files)}
