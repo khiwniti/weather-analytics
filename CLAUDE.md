@@ -284,6 +284,67 @@ RAPIDS requires:
 
 ## Testing
 
+### Python Tests (pytest)
+
+```bash
+# Install test dependencies
+pip install -r requirements.txt
+
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=src --cov-report=html
+
+# Run specific test file
+pytest src/ingestion/nwp/test_gfs_downloader.py
+
+# Run specific test
+pytest src/processing/qc/test_temporal_qc.py::TestCheckTemporalConsistency::test_passes_with_valid_data
+
+# Run with markers
+pytest -m "not slow"  # Skip slow tests
+pytest -m integration  # Only integration tests
+pytest -m "not gpu"   # Skip GPU tests
+
+# Verbose output
+pytest -v
+
+# Stop on first failure
+pytest -x
+```
+
+### Frontend Tests
+
+```bash
+cd src/frontend
+npm test
+
+# Run specific test file
+npm test -- src/utils/__tests__/dataTransform.test.js
+```
+
+### Test Coverage
+
+Current coverage:
+- **Python Unit Tests**: 45 tests covering downloaders, Celery tasks, QC modules
+- **Frontend Tests**: Minimal (utils only)
+- **Integration Tests**: Coming soon
+
+Target: **>80% code coverage**
+
+### CI/CD Pipeline
+
+GitHub Actions workflow (`.github/workflows/test.yml`):
+- Runs on push to master/main/develop
+- Tests Python 3.9, 3.10, 3.11
+- Runs pytest with coverage reporting
+- Lints code (ruff, black, isort)
+- Tests Docker builds
+- Uploads coverage to Codecov
+
+## Testing
+
 ### Frontend Tests
 
 ```bash
