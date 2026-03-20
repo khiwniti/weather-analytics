@@ -104,11 +104,13 @@ docker-compose down
 # Rebuild images
 docker-compose build
 
-# Services: redis, backend, frontend, celery-worker, celery-beat, flower
+# Services: redis, backend, frontend, celery-worker, celery-beat, flower, prometheus, grafana, redis-exporter, node-exporter
 ```
 
 ### Monitoring
 
+- **Grafana (Visual Dashboards)**: http://localhost:3002 (login: admin/admin)
+- **Prometheus (Metrics)**: http://localhost:9090
 - **Flower (Celery monitoring)**: http://localhost:5555
 - **Frontend**: http://localhost:80 (Docker) or http://localhost:3000 (dev)
 - **Backend API**: http://localhost:3001

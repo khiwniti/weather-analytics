@@ -7,9 +7,10 @@ This document describes the monitoring and observability setup for the AI Weathe
 The monitoring stack consists of:
 
 1. **Prometheus** - Time-series metrics collection and alerting
-2. **Redis Exporter** - Exposes Redis/Celery broker metrics
-3. **Node Exporter** - System-level metrics (CPU, memory, disk, network)
-4. **Custom Python Metrics** - Application-level metrics from the data pipeline
+2. **Grafana** - Visual dashboards and data exploration
+3. **Redis Exporter** - Exposes Redis/Celery broker metrics
+4. **Node Exporter** - System-level metrics (CPU, memory, disk, network)
+5. **Custom Python Metrics** - Application-level metrics from the data pipeline
 
 ## Components
 
@@ -26,7 +27,48 @@ Main metrics collection engine that scrapes metrics from all exporters.
 - 30-day data retention
 - Multiple scrape targets configured
 
-### 2. Application Metrics (Port 9091)
+### 2. Grafana (Port 3002)
+
+Visual dashboard platform for exploring and visualizing Prometheus metrics.
+
+**Access**: http://localhost:3002
+
+**Default Login**:
+- Username: `admin`
+- Password: `admin` (change on first login)
+
+**Pre-configured Dashboards**:
+
+1. **Weather Pipeline Overview** - High-level system health
+   - Tasks per minute (success rate)
+   - Task success rate gauge
+   - Current queue depth
+   - Active workers count
+   - Task duration trends
+   - Quality control pass rates
+   - Error rates by component
+
+2. **Data Ingestion Details** - Download and processing metrics
+   - Average download duration by source
+   - Average file sizes downloaded
+   - Download success/failure rates
+   - Processing duration by operation
+   - Files processed rate
+   - Summary table by data source
+
+3. **System Performance** - Infrastructure monitoring
+   - CPU usage percentage
+   - Memory usage (used vs available)
+   - Disk usage (used vs available)
+   - Network I/O (RX/TX)
+   - Redis memory usage
+   - Redis connection count
+
+**Configuration**:
+- Datasource: `configs/grafana/provisioning/datasources/prometheus.yml`
+- Dashboards: `configs/grafana/provisioning/dashboards/*.json`
+
+### 3. Application Metrics (Port 9091)
 
 Custom Prometheus metrics exposed by the Celery worker via `src/monitoring/server.py`.
 
@@ -59,7 +101,7 @@ Custom Prometheus metrics exposed by the Celery worker via `src/monitoring/serve
 - **Storage**:
   - `weather_storage_used_bytes` - Disk space usage
 
-### 3. Redis Exporter (Port 9121)
+### 4. Redis Exporter (Port 9121)
 
 Monitors the Redis instance used as Celery's broker.
 
@@ -69,7 +111,7 @@ Monitors the Redis instance used as Celery's broker.
 - `redis_commands_total` - Total commands executed
 - `redis_keyspace_*` - Database size and keys
 
-### 4. Node Exporter (Port 9100)
+### 5. Node Exporter (Port 9100)
 
 System-level metrics from the host machine.
 
@@ -89,8 +131,49 @@ docker-compose up -d
 
 # View logs
 docker-compose logs -f prometheus
+docker-compose logs -f grafana
 docker-compose logs -f celery-worker
 ```
+
+### Accessing Grafana
+
+Navigate to **http://localhost:3002** and log in:
+
+**First-time setup**:
+1. Username: `admin`
+2. Password: `admin`
+3. You'll be prompted to change the password (recommended but optional)
+
+**Using the Dashboards**:
+
+1. **Main Dashboard** - Click the "Dashboards" icon (4 squares) in the left sidebar
+2. **Browse Dashboards** - You'll see 3 pre-configured dashboards:
+   - **Weather Pipeline Overview** - Start here for system health
+   - **Data Ingestion Details** - Deep dive into download/processing
+   - **System Performance** - Infrastructure metrics
+
+3. **Time Range** - Use the time picker (top right) to adjust the view:
+   - Last 6 hours (default)
+   - Last 24 hours
+   - Last 7 days
+   - Custom range
+
+4. **Refresh** - Auto-refresh every 30s (configurable in top right)
+
+5. **Panel Actions**:
+   - Hover over any panel → Click title → View
+   - Click "Edit" to customize queries
+   - Click "Share" to get snapshot or embed links
+
+6. **Explore Mode** - Click "Explore" (compass icon) to run ad-hoc queries
+
+**Creating Custom Dashboards**:
+1. Click "+" icon → Dashboard
+2. Add Panel → Choose visualization type
+3. Select "Prometheus" datasource
+4. Write PromQL query
+5. Configure display options
+6. Save dashboard
 
 ### Accessing Prometheus
 
@@ -100,7 +183,7 @@ Navigate to http://localhost:9090 and explore:
 2. **Alerts Tab** - View active alerts (when configured)
 3. **Status → Targets** - Check scrape target health
 
-### Example Queries
+### Example Prometheus Queries
 
 **Task Success Rate**:
 ```promql
@@ -267,7 +350,7 @@ docker-compose down -v
 
 ## Next Steps
 
-1. **Grafana Integration** - Visual dashboards for metrics
+1. ✅ **Grafana Integration** - Visual dashboards for metrics (COMPLETE)
 2. **Alerting Rules** - Define alert conditions in Prometheus
 3. **Alertmanager** - Route alerts to Slack, email, PagerDuty
 4. **Centralized Logging** - Add Loki for log aggregation
@@ -279,11 +362,13 @@ docker-compose down -v
 |---------|------|---------|
 | Frontend | 80 | Web UI |
 | Backend API | 3001 | REST API |
+| Grafana | 3002 | Visual dashboards |
 | Flower | 5555 | Celery monitoring |
 | Redis | 6379 | Celery broker |
 | Prometheus | 9090 | Metrics collection UI |
 | Celery Metrics | 9091 | Application metrics endpoint |
 | Node Exporter | 9100 | System metrics |
+| Redis Exporter | 9121 | Redis metrics |
 | Redis Exporter | 9121 | Redis metrics |
 
 ---

@@ -112,6 +112,24 @@ services:
       - node-exporter
     restart: unless-stopped
 
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3002:3000"
+    volumes:
+      - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3002
+      - GF_INSTALL_PLUGINS=
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
   # Redis Exporter for Celery broker metrics
   redis-exporter:
     image: oliver006/redis_exporter:latest
@@ -147,3 +165,4 @@ volumes:
   redis_data:
   data_tmp:
   prometheus_data:
+  grafana_data:

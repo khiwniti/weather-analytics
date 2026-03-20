@@ -14,7 +14,11 @@
       "Bash(git commit -m \"test: add HRRR downloader unit tests:*)",
       "Bash(git commit -m \"docs: add comprehensive testing documentation:*)",
       "Bash(git commit -m \"feat: add Prometheus metrics collection:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(git push:*)"
     ]
   }
 }
