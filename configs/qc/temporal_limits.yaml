@@ -1,0 +1,13 @@
+variables:
+  temperature:
+    max_change: 10  # °C per hour
+    units: celsius
+  pressure:
+    max_change: 10  # hPa per hour
+    units: hpa
+  wind_speed:
+    max_change: 30  # m/s per hour
+    units: mps
+  precipitation:
+    min: 0  # mm cannot be negative
+    units: mm

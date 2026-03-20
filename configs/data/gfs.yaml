@@ -1,0 +1,50 @@
+# GFS Configuration
+# Global Forecast System data ingestion settings
+
+source: nomads
+resolution: 0.25  # degrees (~28km)
+
+# Forecast cycles (UTC)
+cycles: ["00", "06", "12", "18"]
+
+# Forecast hours to download (0-384 for 16-day forecast)
+forecast_hours: [0, 1, 2, 3, 4, 5, 6, 12, 18, 24, 30, 36, 42, 48, 60, 72, 96, 120, 144, 168, 192, 216, 240, 264, 288, 312, 336, 360, 384]
+
+# Variables to download
+variables:
+  surface:
+    - TMP    # Temperature
+    - UGRD   # U-component of wind
+    - VGRD   # V-component of wind
+    - PRATE  # Precipitation rate
+    - APCP   # Accumulated precipitation
+    - CAPE   # Convective available potential energy
+    - CIN    # Convective inhibition
+    - PRMSL  # Pressure reduced to MSL
+    - SPFH   # Specific humidity
+  
+  pressure_levels:
+    - TMP    # Temperature
+    - UGRD   # U-component of wind
+    - VGRD   # V-component of wind
+    - HGT    # Geopotential height
+    - RH     # Relative humidity
+    - OMEGA  # Vertical velocity
+
+# Pressure levels (hPa)
+levels: [1000, 925, 850, 700, 500, 400, 300, 250, 200, 150, 100, 70, 50, 30, 20, 10]
+
+# Download settings
+download:
+  retry_attempts: 3
+  retry_delay_seconds: 300  # 5 minutes
+  timeout_seconds: 3600     # 1 hour per file
+  concurrent_downloads: 2
+
+# Storage settings
+storage:
+  format: zarr
+  compression: lz4
+  chunk_size_time: 1
+  chunk_size_lat: 180
+  chunk_size_lon: 360

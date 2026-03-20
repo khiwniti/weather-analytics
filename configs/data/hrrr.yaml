@@ -1,0 +1,44 @@
+# HRRR Configuration
+# High-Resolution Rapid Refresh data ingestion settings
+
+source: nomads
+resolution: 3km
+domain: CONUS
+
+# Forecast cycles (hourly)
+cycles: ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
+
+# Forecast hours to download (0-18 for hourly cycles)
+forecast_hours: [0, 1, 2, 3, 4, 5, 6, 12, 18]
+
+# Variables to download
+variables:
+  surface:
+    - TMP    # Temperature
+    - DPT    # Dewpoint temperature
+    - UGRD   # U-component of wind
+    - VGRD   # V-component of wind
+    - REF    # Composite reflectivity
+    - APCP   # Accumulated precipitation
+    - VIS    # Visibility
+    - PRES   # Surface pressure
+    - CAPE   # CAPE
+    - CIN    # CIN
+
+# Pressure levels (hPa) for 3D fields
+levels: [1000, 925, 850, 700, 500, 300, 250, 200]
+
+# Download settings
+download:
+  retry_attempts: 3
+  retry_delay_seconds: 180  # 3 minutes
+  timeout_seconds: 1800     # 30 minutes per file
+  concurrent_downloads: 4
+
+# Storage settings
+storage:
+  format: zarr
+  compression: lz4
+  chunk_size_time: 1
+  chunk_size_lat: 200
+  chunk_size_lon: 200

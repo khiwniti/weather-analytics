@@ -1,0 +1,5 @@
+packages:
+  - 'src/frontend'
+  - 'src/backend'
+  - 'src/ingestion'
+  - 'src/processing'

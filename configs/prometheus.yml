@@ -1,0 +1,55 @@
+# Prometheus Configuration for AI Weather Analytics
+# Scrapes metrics from various exporters
+
+global:
+  scrape_interval: 15s  # Default scrape interval
+  evaluation_interval: 15s  # Rule evaluation interval
+
+  # Attach these labels to any time series or alerts
+  external_labels:
+    cluster: 'ai-weather-analytics'
+    environment: 'production'
+
+# Alerting configuration (integrate with Alertmanager later)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+          # - 'alertmanager:9093'
+
+# Rule files for alerting
+rule_files:
+  # - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Weather ingestion pipeline metrics
+  - job_name: 'weather-pipeline'
+    static_configs:
+      - targets: ['celery-worker:9091']
+    scrape_interval: 10s
+    metrics_path: '/metrics'
+
+  # Redis metrics (Celery broker)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 10s
+
+  # System metrics (CPU, memory, disk)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s
+
+  # Backend API metrics (if implemented)
+  - job_name: 'backend-api'
+    static_configs:
+      - targets: ['backend:3001']
+    metrics_path: '/metrics'
+    scrape_interval: 10s

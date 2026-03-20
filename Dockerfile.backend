@@ -1,0 +1,6 @@
+FROM node:20-alpine
+WORKDIR /app
+COPY . .
+RUN npm install -g pnpm && pnpm install --filter ai-weather-backend --frozen-lockfile
+WORKDIR /app/src/backend
+CMD ["node", "server.js"]

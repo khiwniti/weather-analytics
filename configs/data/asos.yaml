@@ -1,0 +1,68 @@
+source: iem
+update_interval: 1hour
+
+stations: all
+
+priority_stations:
+  - KJFK
+  - KLAX
+  - KORD
+  - KDFW
+  - KATL
+  - KSFO
+  - KDEN
+  - KLAS
+  - KPHX
+  - KMIA
+  - KIAH
+  - KSEA
+  - KMCO
+  - KEWR
+  - KDTW
+  - KMSP
+  - KBOS
+  - KPHL
+  - KLGA
+  - KFLL
+
+variables:
+  - tmpf
+  - dwpf
+  - sknt
+  - drct
+  - p01i
+  - mslp
+  - vsby
+
+variable_mapping:
+  tmpf: temperature
+  dwpf: dewpoint
+  sknt: wind_speed
+  drct: wind_direction
+  p01i: precipitation
+  mslp: pressure
+  vsby: visibility
+
+units:
+  tmpf: F
+  dwpf: F
+  sknt: kt
+  drct: deg
+  p01i: in
+  mslp: hPa
+  vsby: mi
+
+quality_flags:
+  missing: M
+  trace: T
+
+storage:
+  format: zarr
+  compression: lz4
+  compression_level: 5
+  chunks: [1000]
+
+api:
+  url: https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py
+  timezone: UTC
+  format: comma

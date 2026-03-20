@@ -1,0 +1,16 @@
+retention:
+  gfs:
+    keep_cycles: 3  # current + 2 previous
+    schedule: "0 */6 * * *"  # every 6 hours
+  hrrr:
+    keep_cycles: 3
+    schedule: "0 * * * *"  # hourly
+  goes:
+    keep_cycles: 3
+    schedule: "*/30 * * * *"  # every 30 minutes
+  nexrad:
+    keep_cycles: 3
+    schedule: "*/30 * * * *"
+  asos:
+    keep_cycles: 3
+    schedule: "0 * * * *"

@@ -1,0 +1,51 @@
+satellites:
+  - name: GOES-16
+    bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    domain: CONUS
+    update_interval: 5min
+    product: ABI-L1b-RadC
+    bucket: noaa-goes16
+
+  - name: GOES-17
+    bands: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    domain: CONUS
+    update_interval: 5min
+    product: ABI-L1b-RadC
+    bucket: noaa-goes17
+
+domains:
+  CONUS: CONUS
+  FullDisk: F
+  Mesoscale-1: M1
+  Mesoscale-2: M2
+
+storage:
+  format: zarr
+  compression: lz4
+  compression_level: 5
+  chunks:
+    band: 1
+    x: 500
+    y: 500
+
+variables:
+  Rad: radiance
+  CMI: cloud_and_moisture_imagery
+
+bands:
+  1: visible_0.47um
+  2: visible_0.64um
+  3: near_ir_0.86um
+  4: near_ir_1.37um
+  5: near_ir_1.6um
+  6: near_ir_2.2um
+  7: shortwave_ir_3.9um
+  8: water_vapor_6.2um
+  9: water_vapor_6.9um
+  10: water_vapor_7.3um
+  11: longwave_ir_8.4um
+  12: longwave_ir_9.6um
+  13: longwave_ir_10.3um
+  14: longwave_ir_11.2um
+  15: longwave_ir_12.3um
+  16: longwave_ir_13.3um

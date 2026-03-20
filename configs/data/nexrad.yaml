@@ -1,0 +1,65 @@
+source: aws
+bucket: noaa-nexrad-level2
+update_interval: 5min
+level: 2
+
+stations:
+  - KTLX
+  - KFWS
+  - KENX
+  - KLOT
+  - KMLB
+  - KLWX
+  - KBOX
+  - KCLE
+  - KGRB
+  - KIND
+  - KJAX
+  - KLBB
+  - KMHX
+  - KOAX
+  - KPBZ
+  - KRIW
+  - KRLX
+  - KRTX
+  - KSEW
+  - KSFX
+  - KSHV
+  - KSOX
+  - KSRX
+  - KTBW
+  - KTLH
+  - KTXK
+  - KTYX
+  - KUDX
+  - KUEX
+  - KVNX
+  - KVTX
+  - KVWX
+  - KYUX
+  - KEWX
+  - KHGX
+  - KFDR
+  - KAMA
+  - KDDC
+  - KICT
+  - KINX
+  - KOUN
+  - KLZK
+  - KPOE
+  - KLCH
+
+variables:
+  - reflectivity
+  - radial_velocity
+  - spectrum_width
+
+processing:
+  grid_shape: [1000, 1000]
+  grid_extent_km: 230
+
+storage:
+  format: zarr
+  compression: lz4
+  compression_level: 5
+  chunks: [250, 250]

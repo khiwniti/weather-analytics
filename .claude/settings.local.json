@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"fix: remove demo processing limits in Celery tasks:*)",
+      "Bash(grep -r \"AWS\\\\|S3\\\\|bucket\" --include=*.env* --include=*.yaml --include=*.yml .)",
+      "Bash(git commit -m \"feat: enable S3 storage for processed weather data:*)",
+      "Bash(git commit -m \"feat: implement backend API data endpoints:*)",
+      "Bash(git commit -m \"feat: implement weather visualization UI:*)",
+      "Bash(git commit -m \"test: set up pytest infrastructure:*)",
+      "Bash(git commit -m \"test: add comprehensive unit tests for data pipeline:*)",
+      "Bash(git commit -m \"ci: add GitHub Actions CI/CD pipeline:*)",
+      "Bash(git commit -m \"test: add HRRR downloader unit tests:*)",
+      "Bash(git commit -m \"docs: add comprehensive testing documentation:*)",
+      "Bash(git commit -m \"feat: add Prometheus metrics collection:*)",
+      "Bash(chmod:*)"
+    ]
+  }
+}

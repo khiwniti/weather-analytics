@@ -52,7 +52,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: celery -A src.ingestion.scheduler.tasks worker --loglevel=info
+    ports:
+      - "9091:9091"  # Prometheus metrics endpoint
     depends_on:
       redis:
         condition: service_healthy
@@ -91,6 +92,53 @@ services:
     depends_on:
       - redis
 
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    depends_on:
+      - celery-worker
+      - redis-exporter
+      - node-exporter
+    restart: unless-stopped
+
+  # Redis Exporter for Celery broker metrics
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    ports:
+      - "9121:9121"
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # Node Exporter for system metrics
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/host'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host:ro
+    restart: unless-stopped
+
 networks:
   default:
     name: ai-weather-network
@@ -98,3 +146,4 @@ networks:
 volumes:
   redis_data:
   data_tmp:
+  prometheus_data:
