@@ -1,0 +1,77 @@
+# This file specifies files that are *not* uploaded to Google Cloud
+# using gcloud. It follows the same syntax as .gitignore, with the addition of
+# "#!include" directives (which insert the entries of the given .gitignore-style
+# file at that point).
+
+# Include .gitignore
+#!include:.gitignore
+
+# Node modules
+node_modules/
+src/frontend/node_modules/
+src/backend/node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.py[cod]
+*$py.class
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+*.cover
+.hypothesis/
+
+# Build outputs
+src/frontend/dist/
+src/frontend/build/
+*.log
+
+# Development
+.env
+.env.local
+.env.*.local
+.vscode/
+.idea/
+
+# Documentation
+.planning/
+*.md
+!README.md
+!.gcp/*.md
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker (not needed in Cloud Build)
+docker-compose.yml
+Dockerfile.backend
+Dockerfile.frontend
+Dockerfile
+
+# Monitoring configs (not needed in Cloud Run)
+configs/prometheus/
+configs/grafana/
+configs/loki/
+
+# Temporary files
+tmp/
+.tmp/
+*.tmp
+.DS_Store
+
+# Large files
+*.grib2
+*.zarr/
+*.nc
+*.hdf5
+
+# CI/CD (GitHub Actions not needed)
+.github/
