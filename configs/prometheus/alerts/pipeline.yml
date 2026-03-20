@@ -1,0 +1,191 @@
+groups:
+  - name: weather_pipeline_alerts
+    interval: 30s
+    rules:
+      # Task failure alerts
+      - alert: HighTaskFailureRate
+        expr: |
+          (
+            rate(weather_task_total{status="failure"}[5m])
+            /
+            rate(weather_task_total[5m])
+          ) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          component: celery
+        annotations:
+          summary: "High task failure rate detected"
+          description: "Task failure rate is {{ $value | humanizePercentage }} over the last 5 minutes. Task: {{ $labels.task_name }}"
+
+      - alert: CriticalTaskFailureRate
+        expr: |
+          (
+            rate(weather_task_total{status="failure"}[5m])
+            /
+            rate(weather_task_total[5m])
+          ) > 0.5
+        for: 2m
+        labels:
+          severity: critical
+          component: celery
+        annotations:
+          summary: "CRITICAL: Very high task failure rate"
+          description: "Task failure rate is {{ $value | humanizePercentage }} over the last 5 minutes. Task: {{ $labels.task_name }}. Immediate investigation required!"
+
+      - alert: NoTasksExecuting
+        expr: rate(weather_task_total[10m]) == 0
+        for: 15m
+        labels:
+          severity: warning
+          component: celery
+        annotations:
+          summary: "No tasks have executed recently"
+          description: "No tasks have been executed in the last 15 minutes. Check if Celery Beat is running."
+
+      # Worker alerts
+      - alert: NoActiveWorkers
+        expr: weather_active_workers == 0
+        for: 5m
+        labels:
+          severity: critical
+          component: celery
+        annotations:
+          summary: "No active Celery workers"
+          description: "No active Celery workers detected. Data ingestion is halted!"
+
+      - alert: LowWorkerCount
+        expr: weather_active_workers < 2
+        for: 10m
+        labels:
+          severity: warning
+          component: celery
+        annotations:
+          summary: "Low worker count"
+          description: "Only {{ $value }} worker(s) active. Consider scaling up for better throughput."
+
+      # Queue alerts
+      - alert: HighQueueDepth
+        expr: weather_queue_depth > 100
+        for: 10m
+        labels:
+          severity: warning
+          component: celery
+        annotations:
+          summary: "High queue depth detected"
+          description: "Queue depth is {{ $value }} tasks. Workers may be overwhelmed or stuck."
+
+      - alert: CriticalQueueDepth
+        expr: weather_queue_depth > 500
+        for: 5m
+        labels:
+          severity: critical
+          component: celery
+        annotations:
+          summary: "CRITICAL: Very high queue depth"
+          description: "Queue depth is {{ $value }} tasks. System is severely backlogged!"
+
+      # Download alerts
+      - alert: HighDownloadFailureRate
+        expr: |
+          (
+            rate(weather_download_total{status="failure"}[10m])
+            /
+            rate(weather_download_total[10m])
+          ) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          component: downloader
+        annotations:
+          summary: "High download failure rate"
+          description: "Download failure rate for {{ $labels.source }} is {{ $value | humanizePercentage }}. Check network connectivity and data source availability."
+
+      - alert: SlowDownloads
+        expr: |
+          (
+            rate(weather_download_duration_seconds_sum[5m])
+            /
+            rate(weather_download_duration_seconds_count[5m])
+          ) > 300
+        for: 10m
+        labels:
+          severity: warning
+          component: downloader
+        annotations:
+          summary: "Slow downloads detected"
+          description: "Average download time for {{ $labels.source }} is {{ $value }}s. Network or source issues possible."
+
+      # Processing alerts
+      - alert: SlowProcessing
+        expr: |
+          (
+            rate(weather_processing_duration_seconds_sum[5m])
+            /
+            rate(weather_processing_duration_seconds_count[5m])
+          ) > 600
+        for: 10m
+        labels:
+          severity: warning
+          component: processor
+        annotations:
+          summary: "Slow processing detected"
+          description: "Average processing time for {{ $labels.source }}/{{ $labels.operation }} is {{ $value }}s."
+
+      # Quality control alerts
+      - alert: LowQCPassRate
+        expr: weather_qc_pass_rate < 80
+        for: 15m
+        labels:
+          severity: warning
+          component: qc
+        annotations:
+          summary: "Low quality control pass rate"
+          description: "QC pass rate for {{ $labels.source }} is {{ $value }}%. Data quality issues detected."
+
+      - alert: CriticalQCPassRate
+        expr: weather_qc_pass_rate < 50
+        for: 5m
+        labels:
+          severity: critical
+          component: qc
+        annotations:
+          summary: "CRITICAL: Very low QC pass rate"
+          description: "QC pass rate for {{ $labels.source }} is {{ $value }}%. Severe data quality issues!"
+
+      # Error rate alerts
+      - alert: HighErrorRate
+        expr: rate(weather_errors_total[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: "{{ $labels.component }}"
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate in {{ $labels.component }} is {{ $value }}/s. Error type: {{ $labels.error_type }}"
+
+      - alert: CriticalErrorRate
+        expr: rate(weather_errors_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: critical
+          component: "{{ $labels.component }}"
+        annotations:
+          summary: "CRITICAL: Very high error rate"
+          description: "Error rate in {{ $labels.component }} is {{ $value }}/s. Error type: {{ $labels.error_type }}. Immediate action required!"
+
+      # Task duration alerts
+      - alert: SlowTaskExecution
+        expr: |
+          (
+            rate(weather_task_duration_seconds_sum{status="success"}[10m])
+            /
+            rate(weather_task_duration_seconds_count{status="success"}[10m])
+          ) > 1800
+        for: 15m
+        labels:
+          severity: warning
+          component: celery
+        annotations:
+          summary: "Tasks taking longer than expected"
+          description: "Average task duration for {{ $labels.task_name }} is {{ $value }}s (>30 minutes). Performance degradation detected."

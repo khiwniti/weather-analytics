@@ -351,7 +351,7 @@ docker-compose down -v
 ## Next Steps
 
 1. ✅ **Grafana Integration** - Visual dashboards for metrics (COMPLETE)
-2. **Alerting Rules** - Define alert conditions in Prometheus
+2. ✅ **Alerting Rules** - Define alert conditions in Prometheus (COMPLETE - see ALERTING.md)
 3. **Alertmanager** - Route alerts to Slack, email, PagerDuty
 4. **Centralized Logging** - Add Loki for log aggregation
 5. **Distributed Tracing** - Add Jaeger for request tracing

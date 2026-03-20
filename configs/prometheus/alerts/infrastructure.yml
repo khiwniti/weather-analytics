@@ -1,0 +1,175 @@
+groups:
+  - name: infrastructure_alerts
+    interval: 30s
+    rules:
+      # CPU alerts
+      - alert: HighCPUUsage
+        expr: |
+          100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value | humanize }}% on {{ $labels.instance }}. Consider scaling resources."
+
+      - alert: CriticalCPUUsage
+        expr: |
+          100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 5m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "CRITICAL: Very high CPU usage"
+          description: "CPU usage is {{ $value | humanize }}% on {{ $labels.instance }}. System may be unresponsive!"
+
+      # Memory alerts
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)
+            /
+            node_memory_MemTotal_bytes
+          ) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value | humanize }}% on {{ $labels.instance }}."
+
+      - alert: CriticalMemoryUsage
+        expr: |
+          (
+            (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)
+            /
+            node_memory_MemTotal_bytes
+          ) * 100 > 95
+        for: 5m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "CRITICAL: Memory nearly exhausted"
+          description: "Memory usage is {{ $value | humanize }}% on {{ $labels.instance }}. OOM killer may activate!"
+
+      # Disk alerts
+      - alert: HighDiskUsage
+        expr: |
+          (
+            (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_avail_bytes{mountpoint="/"})
+            /
+            node_filesystem_size_bytes{mountpoint="/"}
+          ) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High disk usage detected"
+          description: "Disk usage is {{ $value | humanize }}% on {{ $labels.instance }}. Consider cleanup or expansion."
+
+      - alert: CriticalDiskUsage
+        expr: |
+          (
+            (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_avail_bytes{mountpoint="/"})
+            /
+            node_filesystem_size_bytes{mountpoint="/"}
+          ) * 100 > 95
+        for: 5m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "CRITICAL: Disk nearly full"
+          description: "Disk usage is {{ $value | humanize }}% on {{ $labels.instance }}. Services may fail!"
+
+      - alert: DiskWillFillIn24Hours
+        expr: |
+          predict_linear(node_filesystem_avail_bytes{mountpoint="/"}[1h], 24 * 3600) < 0
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "Disk will fill in 24 hours"
+          description: "Based on current growth rate, disk on {{ $labels.instance }} will be full within 24 hours."
+
+      # Network alerts
+      - alert: HighNetworkErrors
+        expr: |
+          rate(node_network_transmit_errs_total[5m]) + rate(node_network_receive_errs_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: network
+        annotations:
+          summary: "High network error rate"
+          description: "Network errors on {{ $labels.device }} ({{ $labels.instance }}): {{ $value }} errors/s"
+
+      # Redis alerts
+      - alert: RedisHighMemory
+        expr: |
+          (redis_memory_used_bytes / redis_memory_max_bytes) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: redis
+        annotations:
+          summary: "Redis memory usage high"
+          description: "Redis memory usage is {{ $value | humanize }}%. Consider increasing maxmemory or eviction policy."
+
+      - alert: RedisHighConnections
+        expr: redis_connected_clients > 100
+        for: 10m
+        labels:
+          severity: warning
+          component: redis
+        annotations:
+          summary: "High Redis connection count"
+          description: "Redis has {{ $value }} connected clients. Possible connection leak."
+
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: redis
+        annotations:
+          summary: "Redis is down"
+          description: "Redis exporter is unreachable. Celery broker may be down!"
+
+      # Service health alerts
+      - alert: PrometheusDown
+        expr: up{job="prometheus"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          component: prometheus
+        annotations:
+          summary: "Prometheus is down"
+          description: "Prometheus self-monitoring failed. Metrics collection halted!"
+
+      - alert: ExporterDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: warning
+          component: "{{ $labels.job }}"
+        annotations:
+          summary: "Exporter is down"
+          description: "{{ $labels.job }} exporter on {{ $labels.instance }} is unreachable for 5 minutes."
+
+      # Storage alerts
+      - alert: HighStorageUsage
+        expr: weather_storage_used_bytes{storage_type="local_tmp"} > 100 * 1024 * 1024 * 1024
+        for: 10m
+        labels:
+          severity: warning
+          component: storage
+        annotations:
+          summary: "High /tmp storage usage"
+          description: "Weather data storage is {{ $value | humanize1024 }}B. Consider implementing retention cleanup."

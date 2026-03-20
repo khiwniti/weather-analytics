@@ -19,7 +19,8 @@ alerting:
 
 # Rule files for alerting
 rule_files:
-  # - "alerts/*.yml"
+  - "alerts/pipeline.yml"
+  - "alerts/infrastructure.yml"
 
 # Scrape configurations
 scrape_configs:
