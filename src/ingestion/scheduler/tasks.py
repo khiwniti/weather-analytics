@@ -6,8 +6,17 @@ Scheduled tasks for automated downloads of GFS, HRRR, and other data sources.
 
 import logging
 from datetime import datetime
+import os
 
 from celery import Celery
+
+# Import metrics tracking
+from ...monitoring.metrics import (
+    track_task_metrics,
+    track_download,
+    track_processing,
+    download_size_bytes,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +41,7 @@ app.conf.update(
 
 
 @app.task(bind=True, max_retries=3)
+@track_task_metrics('ingest_gfs_cycle')
 def ingest_gfs_cycle(self, cycle: str = None):
     """
     Download and process a GFS forecast cycle.
@@ -61,18 +71,28 @@ def ingest_gfs_cycle(self, cycle: str = None):
     logger.info(f"Starting GFS {cycle}Z cycle ingestion")
 
     try:
-        # Download GFS data
+        # Download GFS data with metrics tracking
         output_dir = f"/tmp/gfs/{datetime.utcnow().strftime('%Y%m%d')}/{cycle}"
-        files = download_gfs(
-            cycle, forecast_hours=list(range(385)), output_dir=output_dir
-        )
+
+        with track_download('gfs'):
+            files = download_gfs(
+                cycle, forecast_hours=list(range(385)), output_dir=output_dir
+            )
 
         logger.info(f"Downloaded {len(files)} GFS files")
 
-        # Convert each file to Zarr
+        # Convert each file to Zarr with metrics tracking
         for grib_file in files:
             zarr_path = grib_file.replace(".grib2", ".zarr")
-            convert_grib_to_zarr(grib_file, zarr_path)
+
+            with track_processing('gfs', 'grib_to_zarr'):
+                convert_grib_to_zarr(grib_file, zarr_path)
+
+            # Track file size
+            import os as os_module
+            if os_module.path.exists(grib_file):
+                size = os_module.path.getsize(grib_file)
+                download_size_bytes.labels(source='gfs').observe(size)
 
             # Upload to S3 if configured
             s3_bucket = os.getenv("S3_WEATHER_BUCKET")
