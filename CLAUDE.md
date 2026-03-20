@@ -243,27 +243,23 @@ export default ComponentName;
 
 ### ⚠️ Current Limitations (See .planning/codebase/CONCERNS.md)
 
-1. **Demo Processing Limits**: Tasks only process first 5 GFS files and 3 HRRR files
-   - Location: `src/ingestion/scheduler/tasks.py` lines 73, 118
-   - Remove `[:5]` and `[:3]` slicing for production
-
-2. **S3 Upload Disabled**: Cloud storage commented out
+1. **S3 Upload Disabled**: Cloud storage commented out
    - Location: `src/ingestion/scheduler/tasks.py` line 78
    - Uncomment `upload_to_s3()` call when S3 configured
 
-3. **Ephemeral Storage**: All data in `/tmp` (lost on restart)
+2. **Ephemeral Storage**: All data in `/tmp` (lost on restart)
    - Pattern: `/tmp/{source}/{YYYYMMDD}/{cycle}/`
    - Configure persistent volumes or S3 for production
 
-4. **Minimal Testing**: Python has 0% test coverage
+3. **Minimal Testing**: Python has 0% test coverage
    - Add pytest tests before production
    - Frontend has minimal Jest tests in `src/utils/__tests__/`
 
-5. **Placeholder UI**: Frontend pages are empty shells
+4. **Placeholder UI**: Frontend pages are empty shells
    - Implement visualization components
    - Add data fetching from backend API
 
-6. **No Backend APIs**: Express server only has health check
+5. **No Backend APIs**: Express server only has health check
    - Implement data query endpoints
    - Add authentication/authorization
 
