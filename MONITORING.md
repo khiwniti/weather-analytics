@@ -352,8 +352,8 @@ docker-compose down -v
 
 1. ✅ **Grafana Integration** - Visual dashboards for metrics (COMPLETE)
 2. ✅ **Alerting Rules** - Define alert conditions in Prometheus (COMPLETE - see ALERTING.md)
-3. **Alertmanager** - Route alerts to Slack, email, PagerDuty
-4. **Centralized Logging** - Add Loki for log aggregation
+3. ✅ **Centralized Logging** - Add Loki for log aggregation (COMPLETE - see LOGGING.md)
+4. **Alertmanager** - Route alerts to Slack, email, PagerDuty
 5. **Distributed Tracing** - Add Jaeger for request tracing
 
 ## Ports Reference
@@ -363,8 +363,10 @@ docker-compose down -v
 | Frontend | 80 | Web UI |
 | Backend API | 3001 | REST API |
 | Grafana | 3002 | Visual dashboards |
+| Loki | 3100 | Log storage API |
 | Flower | 5555 | Celery monitoring |
 | Redis | 6379 | Celery broker |
+| Promtail | 9080 | Log collection metrics |
 | Prometheus | 9090 | Metrics collection UI |
 | Celery Metrics | 9091 | Application metrics endpoint |
 | Node Exporter | 9100 | System metrics |
