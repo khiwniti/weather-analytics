@@ -1,0 +1,50 @@
+# Core dependencies for AI Weather Analytics Platform
+# Based on .planning/phases/01-data-ingestion-foundation/01-RESEARCH.md
+
+# Data processing
+xarray>=2024.1
+cfgrib>=0.9.14
+netCDF4>=1.6
+zarr>=2.18
+s3fs>=2024.1
+fsspec>=2024.1
+
+# RAPIDS (GPU-accelerated) - install via conda
+# cudf>=24.12
+# cuspatial>=24.12
+# cupy-cuda12x
+
+# NWP data sources
+herbie>=2024.1
+
+# Satellite data
+goes2go>=2024.1
+
+# Radar data
+arm_pyart>=1.14
+
+# Ground observations
+metpy>=1.6
+
+# Scheduling
+celery>=5.3
+redis>=5.0
+
+# Quality control
+numpy>=1.26
+scipy>=1.12
+
+# Configuration
+pyyaml>=6.0
+
+# Utilities
+requests>=2.31
+progressbar2>=4.2
+
+# Testing
+pytest>=7.4
+pytest-celery>=0.0.0
+pytest-mock>=3.12
+pytest-cov>=4.1
+pytest-asyncio>=0.21
+responses>=0.24  # Mock HTTP requests
