@@ -248,16 +248,6 @@ export default ComponentName;
    - Configure persistent volumes or S3 for production
 
 3. **Minimal Testing**: Python has 0% test coverage
-   - Add pytest tests before production
-   - Frontend has minimal Jest tests in `src/utils/__tests__/`
-
-4. **Placeholder UI**: Frontend pages are empty shells
-   - Implement visualization components
-   - Add data fetching from backend API
-
-5. **No Backend APIs**: Express server only has health check
-   - Implement data query endpoints
-   - Add authentication/authorization
 
 ### GPU Acceleration (RAPIDS)
 
